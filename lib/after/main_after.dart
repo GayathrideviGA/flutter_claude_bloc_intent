@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_claude_bloc_intent/after/bloc/intent_router_bloc.dart';
-import 'package:flutter_claude_bloc_intent/after/bloc/task_bloc.dart';
-import 'package:flutter_claude_bloc_intent/after/intent/intent_classifier.dart';
-import 'package:flutter_claude_bloc_intent/after/ui/task_screen.dart';
+import 'bloc/intent_router_bloc.dart';
+import 'bloc/task_bloc.dart';
+import 'intent/intent_classifier.dart';
+import 'ui/task_screen.dart';
 
-/// Global observer used to trace BLoC lifecycle, events, and transitions.
-///
-/// This is useful while iterating on intent routing because we can inspect
-/// both router events and domain state transitions in one stream.
 class DevPulseBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    debugPrint('EVENT: ${bloc.runtimeType} → $event');
+    debugPrint('🎯 EVENT: ${bloc.runtimeType} → $event');
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
     debugPrint(
-      'STATE: ${bloc.runtimeType}\n'
+      '🔄 STATE: ${bloc.runtimeType}\n'
       '   FROM: ${change.currentState}\n'
       '   TO:   ${change.nextState}',
     );
@@ -46,27 +42,21 @@ class DevPulseBlocObserver extends BlocObserver {
 }
 
 void main() {
-  const anthropicToken = String.fromEnvironment('ANTHROPIC_TOKEN');
+  const anthropicApiKey = String.fromEnvironment('ANTHROPIC_API_KEY');
   Bloc.observer = DevPulseBlocObserver();
 
-  runApp(const AppAfter(authToken: anthropicToken));
+  runApp(const AppAfter(apiKey: anthropicApiKey));
 }
 
-/// Root app widget for the "after" architecture.
-///
-/// It wires:
-/// - [IntentRouterBloc] as the orchestration layer
-/// - [TaskBloc] as the task domain reducer
-/// - [TaskScreenAfter] as the presentation entry point
 class AppAfter extends StatelessWidget {
-  const AppAfter({super.key, required this.authToken});
+  const AppAfter({super.key, required this.apiKey});
 
-  final String authToken;
+  final String apiKey;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tasks',
+      title: 'Tasks — AFTER',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.green)),
 
@@ -74,7 +64,7 @@ class AppAfter extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (_) => IntentRouterBloc(
-              classifier: IntentClassifier(authToken: authToken),
+              classifier: IntentClassifier(authToken: apiKey),
               taskBloc: TaskBloc(),
             ),
           ),
