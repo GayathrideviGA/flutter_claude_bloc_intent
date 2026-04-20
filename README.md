@@ -250,3 +250,7 @@ business logic changes              → correct behavior
 | Testable | Hard | Easy |
 
 ---
+
+## License
+
+MIT
